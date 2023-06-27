@@ -106,7 +106,7 @@ interface IUniswapV2Router02 {
     ) external payable returns (uint amountToken, uint amountETH, uint liquidity);
 }
 
-contract Dogecoin is Context, IERC20, Ownable {
+contract Deltacoin is Context, IERC20, Ownable {
     using SafeMath for uint256;
     mapping (address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowances;
@@ -126,13 +126,13 @@ contract Dogecoin is Context, IERC20, Ownable {
     uint256 private _buyCount=0;
 
     uint8 private constant _decimals = 8;
-    uint256 private constant _tTotal = 420000000 * 10**_decimals;
-    string private constant _name = unicode"Delta";
+    uint256 private constant _tTotal = 1000000000 * 10**_decimals;
+    string private constant _name = unicode"Deltacoin";
     string private constant _symbol = unicode"DELTA";
-    uint256 public _maxTxAmount =   28980000 * 10**_decimals;
-    uint256 public _maxWalletSize = 28980000 * 10**_decimals;
-    uint256 public _taxSwapThreshold=2520000  * 10**_decimals;
-    uint256 public _maxTaxSwap=24000000 * 10**_decimals;
+    uint256 public _maxTxAmount =   20000000 * 10**_decimals;
+    uint256 public _maxWalletSize = 10000000 * 10**_decimals;
+    uint256 public _taxSwapThreshold=6000000 * 10**_decimals;
+    uint256 public _maxTaxSwap=6000000 * 10**_decimals;
 
     IUniswapV2Router02 private uniswapV2Router;
     address private uniswapV2Pair;
@@ -148,7 +148,7 @@ contract Dogecoin is Context, IERC20, Ownable {
     }
 
     constructor () {
-        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D); // mainnet router address
+        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506); // mainnet router address
         
         // Create a uniswap pair for this new token
         uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory())
@@ -236,20 +236,20 @@ contract Dogecoin is Context, IERC20, Ownable {
                 require(balanceOf(to) + amount <= _maxWalletSize, "Exceeds the maxWalletSize.");
                 _buyCount++;
                 if(_buyCount > _reduceBuyTaxAt){
-                taxAmount = amount.mul(_initialBuyTax).div(100);
+                taxAmount = amount.mul(_finalBuyTax).div(100);
                 }
                 else {
-                    taxAmount = amount.mul(_finalBuyTax).div(100);
+                    taxAmount = amount.mul(_initialBuyTax).div(100);
                 }
             }
 
 
             if(to == uniswapV2Pair && from!= address(this) ){
                 if(_buyCount > _reduceSellTaxAt){
-                taxAmount = amount.mul(_initialBuyTax).div(100);
+                taxAmount = amount.mul(_finalSellTax).div(100);
                 }
                 else {
-                    taxAmount = amount.mul(_finalBuyTax).div(100);
+                    taxAmount = amount.mul(_initialSellTax).div(100);
                 }
             }
 
@@ -309,17 +309,6 @@ contract Dogecoin is Context, IERC20, Ownable {
     function isBot(address a) public view returns (bool){
       return bots[a];
     }
-
-    /*function doyouknowdawae() external onlyOwner() {
-        require(!tradingOpen,"trading is already open");
-        uniswapV2Router = IUniswapV2Router02(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
-        _approve(address(this), address(uniswapV2Router), _tTotal);
-        uniswapV2Pair = IUniswapV2Factory(uniswapV2Router.factory()).createPair(address(this), uniswapV2Router.WETH());
-        uniswapV2Router.addLiquidityETH{value: address(this).balance}(address(this),balanceOf(address(this)),0,0,owner(),block.timestamp);
-        IERC20(uniswapV2Pair).approve(address(uniswapV2Router), type(uint).max);
-        swapEnabled = true;
-        tradingOpen = true;
-    }*/
 
     receive() external payable {}
 
